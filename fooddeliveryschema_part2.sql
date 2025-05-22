@@ -13,7 +13,6 @@ CREATE TABLE Customer (
     Email VARCHAR(100)
 );
 
-
 -- Customer Addresses
 CREATE TABLE Customer_Addresses (
     Address_ID SERIAL PRIMARY KEY,
@@ -24,7 +23,6 @@ CREATE TABLE Customer_Addresses (
     Customer_ID INTEGER NOT NULL,
     FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID) ON DELETE CASCADE
 );
-
 
 -- Restaurant
 CREATE TABLE Restaurant (
@@ -38,7 +36,6 @@ CREATE TABLE Restaurant (
     Email VARCHAR(100)
 );
 
-
 -- Menu Items
 CREATE TABLE Menu_Items (
     MenuItem_ID SERIAL PRIMARY KEY,
@@ -46,7 +43,6 @@ CREATE TABLE Menu_Items (
     Price NUMERIC(10, 2) NOT NULL,
     Availability BOOLEAN NOT NULL DEFAULT TRUE
 );
-
 
 -- Restaurant Menu Items (M:M)
 CREATE TABLE Restaurant_Menu_Items (
@@ -57,13 +53,11 @@ CREATE TABLE Restaurant_Menu_Items (
     FOREIGN KEY (MenuItem_ID) REFERENCES Menu_Items(MenuItem_ID) ON DELETE CASCADE
 );
 
-
 -- Cuisine Types
 CREATE TABLE Cuisine_Types (
     Cuisine_ID SERIAL PRIMARY KEY,
     Cuisine_name VARCHAR(50) NOT NULL
 );
-
 
 -- Restaurant Cuisines (M:M)
 CREATE TABLE Restaurant_Cuisines (
@@ -73,7 +67,6 @@ CREATE TABLE Restaurant_Cuisines (
     FOREIGN KEY (Restaurant_ID) REFERENCES Restaurant(Restaurant_ID) ON DELETE CASCADE,
     FOREIGN KEY (Cuisine_ID) REFERENCES Cuisine_Types(Cuisine_ID) ON DELETE CASCADE
 );
-
 
 -- Delivery Personnel
 CREATE TABLE Delivery_Personnel (
@@ -85,18 +78,15 @@ CREATE TABLE Delivery_Personnel (
     Availability BOOLEAN NOT NULL DEFAULT TRUE
 );
 
-
--- Secure Payment Method
+-- Payment Method
 CREATE TABLE Payment_Method (
-    PaymentMethod_ID SERIAL PRIMARY KEY,
+    Payment_ID SERIAL PRIMARY KEY,
+    Transaction_id VARCHAR(100),
+    Payment_type VARCHAR(50) NOT NULL,
+    Payment_status VARCHAR(20) NOT NULL DEFAULT 'Pending',
     Customer_ID INTEGER NOT NULL,
-    Method_Type VARCHAR(50) NOT NULL,
-    Masked_Details VARCHAR(100),
-    Provider_Method_ID VARCHAR(100),
-    Last_Used TIMESTAMP,
     FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID) ON DELETE CASCADE
 );
-
 
 -- Orders
 CREATE TABLE Orders (
@@ -116,21 +106,6 @@ CREATE TABLE Orders (
     FOREIGN KEY (Personnel_ID) REFERENCES Delivery_Personnel(Personnel_ID)
 );
 
-
--- Payments (1:1 with Orders)
-CREATE TABLE Payments (
-    Payment_ID SERIAL PRIMARY KEY,
-    Order_ID INTEGER UNIQUE NOT NULL,
-    PaymentMethod_ID INTEGER NOT NULL,
-    Transaction_ID VARCHAR(100) UNIQUE NOT NULL,
-    Amount NUMERIC(10,2) NOT NULL,
-    Payment_Status VARCHAR(20) NOT NULL DEFAULT 'Pending',
-    Timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID) ON DELETE CASCADE,
-    FOREIGN KEY (PaymentMethod_ID) REFERENCES Payment_Method(PaymentMethod_ID) ON DELETE SET NULL
-);
-
-
 -- Order Item
 CREATE TABLE Order_Item (
     OrderItem_ID SERIAL PRIMARY KEY,
@@ -141,3 +116,6 @@ CREATE TABLE Order_Item (
     FOREIGN KEY (MenuItem_ID) REFERENCES Menu_Items(MenuItem_ID),
     FOREIGN KEY (Order_ID) REFERENCES Orders(Order_ID) ON DELETE CASCADE
 );
+
+
+-- INSERT SAMPLE DATA
