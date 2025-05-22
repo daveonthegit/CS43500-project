@@ -39,6 +39,7 @@ CREATE TABLE Restaurant (
 -- Menu Items
 CREATE TABLE Menu_Items (
     MenuItem_ID SERIAL PRIMARY KEY,                             -- Unique identifier
+    Name VARCHAR(100) NOT NULL,                                 -- Name of Menu item
     Description TEXT,                                           -- TEXT for full description flexibility
     Price NUMERIC(10, 2) NOT NULL,                              -- Currency-safe: 10 total digits, 2 decimals
     Availability BOOLEAN NOT NULL DEFAULT TRUE                  -- True if available for order; defaults to available
@@ -92,6 +93,7 @@ CREATE TABLE Payment_Method (
 -- Orders
 CREATE TABLE Orders (
     Order_ID SERIAL PRIMARY KEY,                                -- Internal tracking ID
+    Created_At TIMESTAMP DEFAULT CURRENT_TIMESTAMP,             -- When order was placed
     Delivery_time TIMESTAMP,                                    -- When delivery is scheduled
     Real_time_location VARCHAR(200),                            -- Optional GPS/notes
     Special_Instructions TEXT,                                  -- Notes like "no onions"
@@ -102,9 +104,11 @@ CREATE TABLE Orders (
     Customer_ID INTEGER NOT NULL,                               -- FK to customer
     Restaurant_ID INTEGER NOT NULL,                             -- FK to restaurant
     Personnel_ID INTEGER NOT NULL,                              -- Assigned delivery person
+    Delivery_Address_ID INTEGER NOT NULL,                       -- FK to delivery address
     FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID) ON DELETE CASCADE,
     FOREIGN KEY (Restaurant_ID) REFERENCES Restaurant(Restaurant_ID),
-    FOREIGN KEY (Personnel_ID) REFERENCES Delivery_Personnel(Personnel_ID)
+    FOREIGN KEY (Personnel_ID) REFERENCES Delivery_Personnel(Personnel_ID),
+    FOREIGN KEY (Delivery_Address_ID) REFERENCES Customer_Addresses(Address_ID)
 );
 
 -- Payments (Linked to specific Order and Method)
@@ -124,7 +128,6 @@ CREATE TABLE Payments (
 CREATE TABLE Order_Item (
     OrderItem_ID SERIAL PRIMARY KEY,                            -- Line item ID
     Quantity INTEGER NOT NULL,                                  -- Quantity ordered
-    Name VARCHAR(100) NOT NULL,                                 -- Snapshot name of item
     MenuItem_ID INTEGER NOT NULL,                               -- FK to menu catalog
     Order_ID INTEGER NOT NULL,                                  -- FK to order
     FOREIGN KEY (MenuItem_ID) REFERENCES Menu_Items(MenuItem_ID),
